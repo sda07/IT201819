@@ -1,7 +1,7 @@
 def calculate_it(total_dict):
 	''' RETURN SUMMARY'''
 	cal_sh = {'GROSS':0, 'TA':0, 'PTAX': 0, 'HRA' : 0, 'IT' : 0, 
-	'CESS' : 0, '80C':0, '80CCD_1B':0, '80D':0, 'PAY': 0 }
+	'CESS' : 0, '80C':0, '80CCD_1B':0, '80D':0, 'PAY': 0, '80G': 0 }
 	for key in list(total_dict.keys()):
 		if key == 'BASIC':
 			cal_sh['GROSS'] += int( total_dict[key] or 0)
@@ -57,6 +57,8 @@ def calculate_it(total_dict):
 			cal_sh['CESS'] += int( total_dict[key] or 0)
 		elif key == 'CGHS':
 			cal_sh['80D'] += int( total_dict[key] or 0)
+		elif key == 'PMRF':
+		    cal_sh['80G'] += int( total_dict[key] or 0)
 
 	return cal_sh
 
@@ -101,8 +103,9 @@ def income_tax(total_dict, sav):
 	ta = int(total_dict['TA'] or 0)
 	ptax = int(total_dict['PTAX'] or 0)
 	tax_paid  = int(total_dict['IT'] or 0) #+  int (total_dict['CESS'] or 0)
-	if (ta > 19200):
-		ta = 19200
+	ta = 40000
+	# if (ta > 19200):
+		# ta = 19200
 	rent = sav['RENT']
 	hbi =int(sav['s_24'] or 0)
 
@@ -111,6 +114,7 @@ def income_tax(total_dict, sav):
 
 	savings_80CCD = int(total_dict['80CCD_1B'] or 0) + sav['s_80CCD']
 	savings_80C = int(total_dict['80C'] or 0) + sav['s_80C']
+	savings_80G = int(total_dict['80G'])
 
 	if savings_80CCD > 50000 :
 		savings_80C  += savings_80CCD - 50000
@@ -121,7 +125,7 @@ def income_tax(total_dict, sav):
 
 	savings_80D = int(total_dict['80D'] or 0) + sav['s_80D']
 	taxable_income = income_from_salary - ta - rent - hbi - ptax
-	total_income = taxable_income - (savings_80C + savings_80CCD + savings_80D)
+	total_income = taxable_income - (savings_80C + savings_80CCD + savings_80D + savings_80G)
 
 	if total_income > 1000000:
 		net_tax = 112500 + round((total_income - 1000000)*.3,0)
@@ -137,7 +141,7 @@ def income_tax(total_dict, sav):
 	print ('-----------------------------')
 	print ('income_from_salary - ', income_from_salary)
 	print (' (-) PTAX            ', ptax)
-	print (' (-) TA              ', ta)
+	print (' (-) S.I.            ', ta)
 	print (' (-) RENT            ', rent)
 	print (' (-) HBI             ', hbi)
 	print ('-----------------------------')
@@ -145,11 +149,12 @@ def income_tax(total_dict, sav):
 	print (' (-) 80C             ', savings_80C)
 	print (' (-) 80D             ', savings_80D)
 	print (' (-) savings_80CCD   ', savings_80CCD)
+	print (' (-) 80G             ', savings_80G)
 	print ('-----------------------------')
 	print ('Total Income        ', total_income)
 	print ('-----------------------------')
 	print ('Income Tax           ', net_tax)
-	print ('E. Cess              ', round(net_tax*.03,0))
+	print ('E. Cess              ', round(net_tax*.04,0))
 	print ('-----------------------------')
 	print ('Tax paid             ', tax_paid )
 	return net_tax
